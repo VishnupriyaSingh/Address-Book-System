@@ -64,7 +64,7 @@ public class AddressBookSystem {
         System.out.println("Welcome to Address Book Program");
 
         while (true) {
-            System.out.println("Choose an option: \n1. Add Contact \n2. View Contacts \n3. Exit");
+            System.out.println("Choose option: \n1. Add Contact \n2. View Contacts \n3. Exit");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
