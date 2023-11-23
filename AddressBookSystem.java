@@ -58,26 +58,33 @@ class AddressBook {
     }
 
     public void editContact(String firstName, Contact updatedContact) {
-        boolean found = false;
         for (int i = 0; i < contacts.size(); i++) {
             Contact c = contacts.get(i);
-            if (c.getFirstName().equalsIgnoreCase(firstName)) {
+            if (c.getFirstName().equals(firstName)) {
                 contacts.set(i, updatedContact);
                 System.out.println("Contact updated successfully!");
-                found = true;
                 return;
             }
         }
-        if(!found)
-        {
-            System.out.println("Contact not found.");
-        }
+        System.out.println("Contact not found.");
     }
 
     public void viewContacts() {
         for (Contact contact : contacts) {
             System.out.println(contact);
         }
+    }
+
+    public void deleteContact(String firstName) {
+        for (int i = 0; i < contacts.size(); i++) {
+            Contact c = contacts.get(i);
+            if (c.getFirstName().equals(firstName)) {
+                contacts.remove(i);
+                System.out.println("Contact deleted successfully!");
+                return;
+            }
+        }
+        System.out.println("Contact not found.");
     }
 }
 
@@ -89,7 +96,7 @@ public class AddressBookSystem {
         System.out.println("Welcome to Address Book Program");
 
         while (true) {
-            System.out.println("Choose an option: \n1. Add Contact \n2. Edit Contact \n3. View Contacts \n4. Exit");
+            System.out.println("Choose an option: \n1. Add Contact \n2. Edit Contact \n3. View Contacts \n4. Delete Contact \n5. Exit");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -155,6 +162,10 @@ public class AddressBookSystem {
             } else if (choice == 3) {
                 addressBook.viewContacts();
             } else if (choice == 4) {
+                System.out.println("Enter the first name of the contact to delete:");
+                String name = scanner.nextLine();
+                addressBook.deleteContact(name);
+            } else if (choice == 5) {
                 break;
             } else {
                 System.out.println("Invalid option! Please choose again.");
