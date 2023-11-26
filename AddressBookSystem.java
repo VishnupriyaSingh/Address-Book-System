@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 class Contact {
     private String firstName;
@@ -27,8 +28,8 @@ class Contact {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public String getLastName() {
+        return lastName;
     }
 
     @Override
@@ -53,8 +54,22 @@ class AddressBook {
         this.contacts = new ArrayList<>();
     }
 
-    public void addContact(Contact contact) {
-        contacts.add(contact);
+    public boolean addContact(Contact contact) {
+        if (!isDuplicate(contact)) {
+            contacts.add(contact);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isDuplicate(Contact newContact) {
+        for (Contact contact : contacts) {
+            if (contact.getFirstName().equalsIgnoreCase(newContact.getFirstName()) &&
+                contact.getLastName().equalsIgnoreCase(newContact.getLastName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void editContact(String firstName, Contact updatedContact) {
@@ -89,6 +104,9 @@ class AddressBook {
 }
 
 public class AddressBookSystem {
+    private static final String EMAIL_REGEX = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+    private static final String PHONE_REGEX = "^[0-9]{10}$";
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         AddressBook addressBook = new AddressBook();
@@ -100,78 +118,81 @@ public class AddressBookSystem {
             int choice = scanner.nextInt();
             scanner.nextLine();
 
-            if (choice == 1) {
-                System.out.println("Enter First Name:");
-                String firstName = scanner.nextLine();
+            switch (choice) {
+                case 1:
+                    addContact(scanner, addressBook);
+                    break;
+                case 2:
+                    System.out.println("Enter the first name of the contact to edit:");
+                    String name = scanner.nextLine();
 
-                System.out.println("Enter Last Name:");
-                String lastName = scanner.nextLine();
-
-                System.out.println("Enter Address:");
-                String address = scanner.nextLine();
-
-                System.out.println("Enter City:");
-                String city = scanner.nextLine();
-
-                System.out.println("Enter State:");
-                String state = scanner.nextLine();
-
-                System.out.println("Enter Zip:");
-                String zip = scanner.nextLine();
-
-                System.out.println("Enter Phone Number:");
-                String phoneNumber = scanner.nextLine();
-
-                System.out.println("Enter Email:");
-                String email = scanner.nextLine();
-
-                Contact newContact = new Contact(firstName, lastName, address, city, state, zip, phoneNumber, email);
-                addressBook.addContact(newContact);
-            } else if (choice == 2) {
-                System.out.println("Enter the first name of the contact to edit:");
-                String name = scanner.nextLine();
-
-                System.out.println("Enter new details for the contact:");
-
-                System.out.println("Enter First Name:");
-                String firstName = scanner.nextLine();
-
-                System.out.println("Enter Last Name:");
-                String lastName = scanner.nextLine();
-
-                System.out.println("Enter Address:");
-                String address = scanner.nextLine();
-
-                System.out.println("Enter City:");
-                String city = scanner.nextLine();
-
-                System.out.println("Enter State:");
-                String state = scanner.nextLine();
-
-                System.out.println("Enter Zip:");
-                String zip = scanner.nextLine();
-
-                System.out.println("Enter Phone Number:");
-                String phoneNumber = scanner.nextLine();
-
-                System.out.println("Enter Email:");
-                String email = scanner.nextLine();
-
-                Contact updatedContact = new Contact(firstName, lastName, address, city, state, zip, phoneNumber, email);
-                addressBook.editContact(name, updatedContact);
-            } else if (choice == 3) {
-                addressBook.viewContacts();
-            } else if (choice == 4) {
-                System.out.println("Enter the first name of the contact to delete:");
-                String name = scanner.nextLine();
-                addressBook.deleteContact(name);
-            } else if (choice == 5) {
-                break;
-            } else {
-                System.out.println("Invalid option! Please choose again.");
+                    Contact updatedContact = getContactDetails(scanner);
+                    addressBook.editContact(name, updatedContact);
+                    break;
+                case 3:
+                    addressBook.viewContacts();
+                    break;
+                case 4:
+                    System.out.println("Enter the first name of the contact to delete:");
+                    name = scanner.nextLine();
+                    addressBook.deleteContact(name);
+                    break;
+                case 5:
+                    System.out.println("Exiting Address Book Program. Goodbye!");
+                    scanner.close();
+                    return;
             }
         }
+    }
 
-        scanner.close();
+    private static void addContact(Scanner scanner, AddressBook addressBook) {
+        Contact newContact = getContactDetails(scanner);
+        if (addressBook.addContact(newContact)) {
+            System.out.println("Contact added successfully!");
+        } else {
+            System.out.println("Duplicate contact found. Contact not added.");
+        }
+    }
+
+    private static Contact getContactDetails(Scanner scanner) {
+        System.out.println("Enter First Name:");
+        String firstName = scanner.nextLine();
+
+        System.out.println("Enter Last Name:");
+        String lastName = scanner.nextLine();
+
+        System.out.println("Enter Address:");
+        String address = scanner.nextLine();
+
+        System.out.println("Enter City:");
+        String city = scanner.nextLine();
+
+        System.out.println("Enter State:");
+        String state = scanner.nextLine();
+
+        System.out.println("Enter Zip:");
+        String zip = scanner.nextLine();
+
+        String phoneNumber;
+        while (true) {
+            System.out.println("Enter Phone Number (10 digits):");
+            phoneNumber = scanner.nextLine();
+            if (Pattern.matches(PHONE_REGEX, phoneNumber)) {
+                break;
+            }
+            System.out.println("Invalid phone number format. Please try again.");
+        }
+
+        String email;
+        while (true) {
+            System.out.println("Enter Email:");
+            email = scanner.nextLine();
+            if (Pattern.matches(EMAIL_REGEX, email)) {
+                break;
+            }
+            System.out.println("Invalid email format. Please try again.");
+        }
+
+        return new Contact(firstName, lastName, address, city, state, zip, phoneNumber, email);
     }
 }
