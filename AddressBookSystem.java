@@ -39,6 +39,10 @@ class Contact implements Comparable<Contact> {
         return state;
     }
 
+    public String getZip() {
+        return zip;
+    }
+
     @Override
     public String toString() {
         return "Contact{" +
@@ -157,6 +161,18 @@ class AddressBook {
         Collections.sort(contacts);
     }
 
+    public void sortContactsByCity() {
+        Collections.sort(contacts, Comparator.comparing(Contact::getCity));
+    }
+
+    public void sortContactsByState() {
+        Collections.sort(contacts, Comparator.comparing(Contact::getState));
+    }
+
+    public void sortContactsByZip() {
+        Collections.sort(contacts, Comparator.comparing(Contact::getZip));
+    }
+
 }
 
 class AddressBookManager {
@@ -258,7 +274,7 @@ public class AddressBookSystem {
 
         while (true) {
             System.out.println(
-                    "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Search Across Address Books \n5. View Persons by City or State \n6. Get Contact Count by City or State \n7. Sort Address Book by Name \n8. Exit");
+                    "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Search Across Address Books \n5. View Persons by City or State \n6. Get Contact Count by City or State \n7. Sort Address Book \n8. Exit");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -295,7 +311,7 @@ public class AddressBookSystem {
                     String bookName1 = scanner.nextLine();
                     AddressBook selectedBook1 = manager.getAddressBook(bookName1);
                     if (selectedBook1 != null) {
-                        sortAddressBookByName(scanner, selectedBook1);
+                        sortAddressBook(scanner, selectedBook1);
                     } else {
                         System.out.println("Address Book not found.");
                     }
@@ -494,6 +510,32 @@ public class AddressBookSystem {
     public static void sortAddressBookByName(Scanner scanner, AddressBook addressBook) {
         addressBook.sortContactsByName();
         System.out.println("Address Book sorted by name:");
+        addressBook.viewContacts();
+    }
+
+    public static void sortAddressBook(Scanner scanner, AddressBook addressBook) {
+        System.out.println("Choose an option: \n1. Sort by Name \n2. Sort by City \n3. Sort by State \n4. Sort by Zip");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (choice) {
+            case 1:
+                addressBook.sortContactsByName();
+                break;
+            case 2:
+                addressBook.sortContactsByCity();
+                break;
+            case 3:
+                addressBook.sortContactsByState();
+                break;
+            case 4:
+                addressBook.sortContactsByZip();
+                break;
+            default:
+                System.out.println("Invalid option! Please choose again.");
+                return;
+        }
+        System.out.println("Sorted Address Book:");
         addressBook.viewContacts();
     }
 }
