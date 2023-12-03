@@ -150,9 +150,13 @@ class AddressBook {
 
 class AddressBookManager {
     public Map<String, AddressBook> addressBookMap;
+    public Map<String, List<Contact>> cityToContactsMap;
+    public Map<String, List<Contact>> stateToContactsMap;
 
     public AddressBookManager() {
         addressBookMap = new HashMap<>();
+        cityToContactsMap = new HashMap<>();
+        stateToContactsMap = new HashMap<>();
     }
 
     public void addAddressBook(String name) {
@@ -195,6 +199,33 @@ class AddressBookManager {
         return foundContacts;
     }
 
+    public void addContactToCityAndStateMaps(Contact contact) {
+        cityToContactsMap.computeIfAbsent(contact.getCity(), k -> new ArrayList<>()).add(contact);
+        stateToContactsMap.computeIfAbsent(contact.getState(), k -> new ArrayList<>()).add(contact);
+    }
+
+    public void viewPersonsByCity(String city) {
+        List<Contact> contacts = cityToContactsMap.getOrDefault(city, Collections.emptyList());
+        if (contacts.isEmpty()) {
+            System.out.println("No contacts found in " + city);
+        } else {
+            for (Contact contact : contacts) {
+                System.out.println(contact);
+            }
+        }
+    }
+
+    public void viewPersonsByState(String state) {
+        List<Contact> contacts = stateToContactsMap.getOrDefault(state, Collections.emptyList());
+        if (contacts.isEmpty()) {
+            System.out.println("No contacts found in " + state);
+        } else {
+            for (Contact contact : contacts) {
+                System.out.println(contact);
+            }
+        }
+    }
+
 }
 
 public class AddressBookSystem {
@@ -209,7 +240,7 @@ public class AddressBookSystem {
 
         while (true) {
             System.out.println(
-                    "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Search Person by City or State \n5. Exit");
+                    "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Search Across Address Books \n5. Exit");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -235,6 +266,7 @@ public class AddressBookSystem {
                 case 4:
                     searchAcrossAddressBooks(scanner, manager);
                     break;
+
                 case 5:
                     System.out.println("Exiting Address Book Program. Goodbye!");
                     scanner.close();
@@ -363,6 +395,38 @@ public class AddressBookSystem {
                         System.out.println(contact);
                     }
                 }
+                break;
+            default:
+                System.out.println("Invalid option! Please choose again.");
+                break;
+        }
+    }
+
+    public static void addContact(Scanner scanner, AddressBook addressBook, AddressBookManager manager) {
+        Contact newContact = getContactDetails(scanner);
+        if (addressBook.addContact(newContact)) {
+            manager.addContactToCityAndStateMaps(newContact);
+            System.out.println("Contact added successfully!");
+        } else {
+            System.out.println("Duplicate contact found. Contact not added.");
+        }
+    }
+
+    public static void viewPersonsByCityOrState(Scanner scanner, AddressBookManager manager) {
+        System.out.println("Choose an option: \n1. View by City \n2. View by State");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (choice) {
+            case 1:
+                System.out.println("Enter City:");
+                String city = scanner.nextLine();
+                manager.viewPersonsByCity(city);
+                break;
+            case 2:
+                System.out.println("Enter State:");
+                String state = scanner.nextLine();
+                manager.viewPersonsByState(state);
                 break;
             default:
                 System.out.println("Invalid option! Please choose again.");
