@@ -1,18 +1,15 @@
 import java.util.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 import java.util.regex.Pattern;
 
 class Contact {
-    private String firstName;
-    private String lastName;
-    private String address;
-    private String city;
-    private String state;
-    private String zip;
-    private String phoneNumber;
-    private String email;
+    public String firstName;
+    public String lastName;
+    public String address;
+    public String city;
+    public String state;
+    public String zip;
+    public String phoneNumber;
+    public String email;
 
     public Contact(String firstName, String lastName, String address, String city, String state, String zip,
             String phoneNumber, String email) {
@@ -32,6 +29,14 @@ class Contact {
 
     public String getLastName() {
         return lastName;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getState() {
+        return state;
     }
 
     @Override
@@ -67,7 +72,7 @@ class Contact {
 }
 
 class AddressBook {
-    private List<Contact> contacts;
+    public List<Contact> contacts;
 
     public AddressBook() {
         this.contacts = new ArrayList<>();
@@ -81,7 +86,7 @@ class AddressBook {
         return false;
     }
 
-    private boolean isDuplicate(Contact newContact) {
+    public boolean isDuplicate(Contact newContact) {
         for (Contact contact : contacts) {
             if (contact.getFirstName().equalsIgnoreCase(newContact.getFirstName()) &&
                     contact.getLastName().equalsIgnoreCase(newContact.getLastName())) {
@@ -120,10 +125,31 @@ class AddressBook {
         }
         System.out.println("Contact not found.");
     }
+
+    public List<Contact> getContactsByCity(String city) {
+        List<Contact> contactsInCity = new ArrayList<>();
+        for (Contact contact : contacts) {
+            if (contact.getCity().equalsIgnoreCase(city)) {
+                contactsInCity.add(contact);
+            }
+        }
+        return contactsInCity;
+    }
+
+    public List<Contact> getContactsByState(String state) {
+        List<Contact> contactsInState = new ArrayList<>();
+        for (Contact contact : contacts) {
+            if (contact.getState().equalsIgnoreCase(state)) {
+                contactsInState.add(contact);
+            }
+        }
+        return contactsInState;
+    }
+
 }
 
 class AddressBookManager {
-    private Map<String, AddressBook> addressBookMap;
+    public Map<String, AddressBook> addressBookMap;
 
     public AddressBookManager() {
         addressBookMap = new HashMap<>();
@@ -152,11 +178,28 @@ class AddressBookManager {
             }
         }
     }
+
+    public List<Contact> searchByCity(String city) {
+        List<Contact> foundContacts = new ArrayList<>();
+        for (AddressBook addressBook : addressBookMap.values()) {
+            foundContacts.addAll(addressBook.getContactsByCity(city));
+        }
+        return foundContacts;
+    }
+
+    public List<Contact> searchByState(String state) {
+        List<Contact> foundContacts = new ArrayList<>();
+        for (AddressBook addressBook : addressBookMap.values()) {
+            foundContacts.addAll(addressBook.getContactsByState(state));
+        }
+        return foundContacts;
+    }
+
 }
 
 public class AddressBookSystem {
-    private static final String EMAIL_REGEX = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
-    private static final String PHONE_REGEX = "^[0-9]{10}$";
+    public static final String EMAIL_REGEX = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+    public static final String PHONE_REGEX = "^[0-9]{10}$";
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -166,7 +209,7 @@ public class AddressBookSystem {
 
         while (true) {
             System.out.println(
-                    "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Exit");
+                    "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Search Person by City or State \n5. Exit");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -190,6 +233,9 @@ public class AddressBookSystem {
                     manager.listAddressBooks();
                     break;
                 case 4:
+                    searchAcrossAddressBooks(scanner, manager);
+                    break;
+                case 5:
                     System.out.println("Exiting Address Book Program. Goodbye!");
                     scanner.close();
                     return;
@@ -200,7 +246,7 @@ public class AddressBookSystem {
         }
     }
 
-    private static void manageAddressBook(Scanner scanner, AddressBook addressBook) {
+    public static void manageAddressBook(Scanner scanner, AddressBook addressBook) {
         while (true) {
             System.out.println(
                     "Choose an option: \n1. Add Contact \n2. Edit Contact \n3. View Contacts \n4. Delete Contact \n5. Return to Main Menu");
@@ -235,7 +281,7 @@ public class AddressBookSystem {
         }
     }
 
-    private static void addContact(Scanner scanner, AddressBook addressBook) {
+    public static void addContact(Scanner scanner, AddressBook addressBook) {
         Contact newContact = getContactDetails(scanner);
         if (addressBook.addContact(newContact)) {
             System.out.println("Contact added successfully!");
@@ -244,7 +290,7 @@ public class AddressBookSystem {
         }
     }
 
-    private static Contact getContactDetails(Scanner scanner) {
+    public static Contact getContactDetails(Scanner scanner) {
         System.out.println("Enter First Name:");
         String firstName = scanner.nextLine();
 
@@ -284,5 +330,43 @@ public class AddressBookSystem {
         }
 
         return new Contact(firstName, lastName, address, city, state, zip, phoneNumber, email);
+    }
+
+    public static void searchAcrossAddressBooks(Scanner scanner, AddressBookManager manager) {
+        System.out.println("Choose an option: \n1. Search by City \n2. Search by State");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (choice) {
+            case 1:
+                System.out.println("Enter City:");
+                String city = scanner.nextLine();
+                List<Contact> contactsInCity = manager.searchByCity(city);
+                if (contactsInCity.isEmpty()) {
+                    System.out.println("No contacts found in " + city);
+                } else {
+                    System.out.println("Contacts found in " + city + ":");
+                    for (Contact contact : contactsInCity) {
+                        System.out.println(contact);
+                    }
+                }
+                break;
+            case 2:
+                System.out.println("Enter State:");
+                String state = scanner.nextLine();
+                List<Contact> contactsInState = manager.searchByState(state);
+                if (contactsInState.isEmpty()) {
+                    System.out.println("No contacts found in " + state);
+                } else {
+                    System.out.println("Contacts found in " + state + ":");
+                    for (Contact contact : contactsInState) {
+                        System.out.println(contact);
+                    }
+                }
+                break;
+            default:
+                System.out.println("Invalid option! Please choose again.");
+                break;
+        }
     }
 }
