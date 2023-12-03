@@ -1,7 +1,7 @@
 import java.util.*;
 import java.util.regex.Pattern;
 
-class Contact {
+class Contact implements Comparable<Contact> {
     public String firstName;
     public String lastName;
     public String address;
@@ -67,6 +67,13 @@ class Contact {
     @Override
     public int hashCode() {
         return Objects.hash(firstName.toLowerCase(), lastName.toLowerCase());
+    }
+
+    @Override
+    public int compareTo(Contact other) {
+        String fullName = this.firstName + " " + this.lastName;
+        String otherFullName = other.firstName + " " + other.lastName;
+        return fullName.compareToIgnoreCase(otherFullName);
     }
 
 }
@@ -144,6 +151,10 @@ class AddressBook {
             }
         }
         return contactsInState;
+    }
+
+    public void sortContactsByName() {
+        Collections.sort(contacts);
     }
 
 }
@@ -247,7 +258,7 @@ public class AddressBookSystem {
 
         while (true) {
             System.out.println(
-                    "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Search Across Address Books \n5. View Persons by City or State \n6. Get Contact Count by City or State \n7. Exit");
+                    "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Search Across Address Books \n5. View Persons by City or State \n6. Get Contact Count by City or State \n7. Sort Address Book by Name \n8. Exit");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -280,6 +291,16 @@ public class AddressBookSystem {
                     getContactCountByCityOrState(scanner, manager);
                     break;
                 case 7:
+                    System.out.println("Enter Name of Address Book to sort:");
+                    String bookName1 = scanner.nextLine();
+                    AddressBook selectedBook1 = manager.getAddressBook(bookName1);
+                    if (selectedBook1 != null) {
+                        sortAddressBookByName(scanner, selectedBook1);
+                    } else {
+                        System.out.println("Address Book not found.");
+                    }
+                    break;
+                case 8:
                     System.out.println("Exiting Address Book Program. Goodbye!");
                     scanner.close();
                     return;
@@ -468,5 +489,11 @@ public class AddressBookSystem {
                 System.out.println("Invalid option! Please choose again.");
                 break;
         }
+    }
+
+    public static void sortAddressBookByName(Scanner scanner, AddressBook addressBook) {
+        addressBook.sortContactsByName();
+        System.out.println("Address Book sorted by name:");
+        addressBook.viewContacts();
     }
 }
