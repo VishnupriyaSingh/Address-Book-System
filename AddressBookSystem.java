@@ -199,11 +199,6 @@ class AddressBookManager {
         return foundContacts;
     }
 
-    public void addContactToCityAndStateMaps(Contact contact) {
-        cityToContactsMap.computeIfAbsent(contact.getCity(), k -> new ArrayList<>()).add(contact);
-        stateToContactsMap.computeIfAbsent(contact.getState(), k -> new ArrayList<>()).add(contact);
-    }
-
     public void viewPersonsByCity(String city) {
         List<Contact> contacts = cityToContactsMap.getOrDefault(city, Collections.emptyList());
         if (contacts.isEmpty()) {
@@ -226,6 +221,18 @@ class AddressBookManager {
         }
     }
 
+    public void addContactToCityAndStateMaps(Contact contact) {
+        cityToContactsMap.computeIfAbsent(contact.getCity(), k -> new ArrayList<>()).add(contact);
+        stateToContactsMap.computeIfAbsent(contact.getState(), k -> new ArrayList<>()).add(contact);
+    }
+
+    public int getContactCountByCity(String city) {
+        return cityToContactsMap.getOrDefault(city, Collections.emptyList()).size();
+    }
+
+    public int getContactCountByState(String state) {
+        return stateToContactsMap.getOrDefault(state, Collections.emptyList()).size();
+    }
 }
 
 public class AddressBookSystem {
@@ -240,7 +247,7 @@ public class AddressBookSystem {
 
         while (true) {
             System.out.println(
-                    "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Search Across Address Books \n5. Exit");
+                    "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Search Across Address Books \n5. View Persons by City or State \n6. Get Contact Count by City or State \n7. Exit");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -266,8 +273,13 @@ public class AddressBookSystem {
                 case 4:
                     searchAcrossAddressBooks(scanner, manager);
                     break;
-
                 case 5:
+                    viewPersonsByCityOrState(scanner, manager);
+                    break;
+                case 6:
+                    getContactCountByCityOrState(scanner, manager);
+                    break;
+                case 7:
                     System.out.println("Exiting Address Book Program. Goodbye!");
                     scanner.close();
                     return;
@@ -427,6 +439,30 @@ public class AddressBookSystem {
                 System.out.println("Enter State:");
                 String state = scanner.nextLine();
                 manager.viewPersonsByState(state);
+                break;
+            default:
+                System.out.println("Invalid option! Please choose again.");
+                break;
+        }
+    }
+
+    public static void getContactCountByCityOrState(Scanner scanner, AddressBookManager manager) {
+        System.out.println("Choose an option: \n1. Count by City \n2. Count by State");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (choice) {
+            case 1:
+                System.out.println("Enter City:");
+                String city = scanner.nextLine();
+                int cityCount = manager.getContactCountByCity(city);
+                System.out.println("Number of contacts in " + city + ": " + cityCount);
+                break;
+            case 2:
+                System.out.println("Enter State:");
+                String state = scanner.nextLine();
+                int stateCount = manager.getContactCountByState(state);
+                System.out.println("Number of contacts in " + state + ": " + stateCount);
                 break;
             default:
                 System.out.println("Invalid option! Please choose again.");
