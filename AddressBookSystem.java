@@ -14,7 +14,8 @@ class Contact {
     private String phoneNumber;
     private String email;
 
-    public Contact(String firstName, String lastName, String address, String city, String state, String zip, String phoneNumber, String email) {
+    public Contact(String firstName, String lastName, String address, String city, String state, String zip,
+            String phoneNumber, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
@@ -46,6 +47,23 @@ class Contact {
                 ", email='" + email + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        Contact contact = (Contact) obj;
+        return firstName.equalsIgnoreCase(contact.firstName) &&
+                lastName.equalsIgnoreCase(contact.lastName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName.toLowerCase(), lastName.toLowerCase());
+    }
+
 }
 
 class AddressBook {
@@ -56,7 +74,7 @@ class AddressBook {
     }
 
     public boolean addContact(Contact contact) {
-        if (!isDuplicate(contact)) {
+        if (!contacts.contains(contact)) {
             contacts.add(contact);
             return true;
         }
@@ -66,7 +84,7 @@ class AddressBook {
     private boolean isDuplicate(Contact newContact) {
         for (Contact contact : contacts) {
             if (contact.getFirstName().equalsIgnoreCase(newContact.getFirstName()) &&
-                contact.getLastName().equalsIgnoreCase(newContact.getLastName())) {
+                    contact.getLastName().equalsIgnoreCase(newContact.getLastName())) {
                 return true;
             }
         }
@@ -147,7 +165,8 @@ public class AddressBookSystem {
         System.out.println("Welcome to Address Book Program");
 
         while (true) {
-            System.out.println("Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Exit");
+            System.out.println(
+                    "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Exit");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -183,7 +202,8 @@ public class AddressBookSystem {
 
     private static void manageAddressBook(Scanner scanner, AddressBook addressBook) {
         while (true) {
-            System.out.println("Choose an option: \n1. Add Contact \n2. Edit Contact \n3. View Contacts \n4. Delete Contact \n5. Return to Main Menu");
+            System.out.println(
+                    "Choose an option: \n1. Add Contact \n2. Edit Contact \n3. View Contacts \n4. Delete Contact \n5. Return to Main Menu");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
