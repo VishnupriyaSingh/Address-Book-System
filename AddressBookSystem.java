@@ -314,7 +314,7 @@ public class AddressBookSystem {
 
         while (true) {
             System.out.println(
-                "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Search Across Address Books \n5. View Persons by City or State \n6. Get Contact Count by City or State \n7. Sort Address Book \n8. Save Contacts to File \n9. Load Contacts from File \n10. Exit");
+                "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. View Persons by City or State \n5. Get Contact Count by City or State \n6. Sort Contacts in Address Book \n7. Save Contacts to File \n8. Load Contacts from File \n9. Exit");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -341,12 +341,9 @@ public class AddressBookSystem {
                     searchAcrossAddressBooks(scanner, manager);
                     break;
                 case 5:
-                    viewPersonsByCityOrState(scanner, manager);
-                    break;
-                case 6:
                     getContactCountByCityOrState(scanner, manager);
                     break;
-                case 7:
+                case 6:
                     System.out.println("Enter Name of Address Book to sort:");
                     String bookName1 = scanner.nextLine();
                     AddressBook selectedBook1 = manager.getAddressBook(bookName1);
@@ -356,15 +353,15 @@ public class AddressBookSystem {
                         System.out.println("Address Book not found.");
                     }
                     break;
-                    case 8:
+                    case 7:
                         manager.saveContactsToFile();
                         System.out.println("Contacts saved to file successfully.");
                         break;
-                    case 9:
+                    case 8:
                         manager.loadContactsFromFile();
                         System.out.println("Contacts loaded from file successfully.");
                         break;
-                    case 10:
+                    case 9:
                         System.out.println("Exiting Address Book Program. Goodbye!");
                         scanner.close();
                         return;
