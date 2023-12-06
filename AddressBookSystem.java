@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.regex.Pattern;
+import java.io.*;
 
 class Contact implements Comparable<Contact> {
     public String firstName;
@@ -179,6 +180,7 @@ class AddressBookManager {
     public Map<String, AddressBook> addressBookMap;
     public Map<String, List<Contact>> cityToContactsMap;
     public Map<String, List<Contact>> stateToContactsMap;
+    private static final String FILE_PATH = "address_book.txt";
 
     public AddressBookManager() {
         addressBookMap = new HashMap<>();
@@ -260,6 +262,43 @@ class AddressBookManager {
     public int getContactCountByState(String state) {
         return stateToContactsMap.getOrDefault(state, Collections.emptyList()).size();
     }
+
+    public void saveContactsToFile() {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH))) {
+            for (AddressBook addressBook : addressBookMap.values()) {
+                for (Contact contact : addressBook.contacts) {
+                    writer.println(contactToFileString(contact));
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+        }
+    }
+
+    public void loadContactsFromFile() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Contact contact = fileStringToContact(line);
+                AddressBook defaultBook = addressBookMap.getOrDefault("default", new AddressBook());
+                defaultBook.addContact(contact);
+                addressBookMap.putIfAbsent("default", defaultBook);
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading from file: " + e.getMessage());
+        }
+    }
+
+    private String contactToFileString(Contact contact) {
+        return contact.firstName + "," + contact.lastName + "," + contact.address + "," +
+               contact.city + "," + contact.state + "," + contact.zip + "," +
+               contact.phoneNumber + "," + contact.email;
+    }
+
+    private Contact fileStringToContact(String line) {
+        String[] data = line.split(",");
+        return new Contact(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
+    }
 }
 
 public class AddressBookSystem {
@@ -270,11 +309,12 @@ public class AddressBookSystem {
         Scanner scanner = new Scanner(System.in);
         AddressBookManager manager = new AddressBookManager();
 
+        manager.loadContactsFromFile(); 
         System.out.println("Welcome to Address Book Program");
 
         while (true) {
             System.out.println(
-                    "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Search Across Address Books \n5. View Persons by City or State \n6. Get Contact Count by City or State \n7. Sort Address Book \n8. Exit");
+                "Choose an option: \n1. Add Address Book \n2. Select Address Book \n3. List Address Books \n4. Search Across Address Books \n5. View Persons by City or State \n6. Get Contact Count by City or State \n7. Sort Address Book \n8. Save Contacts to File \n9. Load Contacts from File \n10. Exit");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -316,13 +356,21 @@ public class AddressBookSystem {
                         System.out.println("Address Book not found.");
                     }
                     break;
-                case 8:
-                    System.out.println("Exiting Address Book Program. Goodbye!");
-                    scanner.close();
-                    return;
-                default:
-                    System.out.println("Invalid option! Please choose again.");
-                    break;
+                    case 8:
+                        manager.saveContactsToFile();
+                        System.out.println("Contacts saved to file successfully.");
+                        break;
+                    case 9:
+                        manager.loadContactsFromFile();
+                        System.out.println("Contacts loaded from file successfully.");
+                        break;
+                    case 10:
+                        System.out.println("Exiting Address Book Program. Goodbye!");
+                        scanner.close();
+                        return;
+                    default:
+                        System.out.println("Invalid option! Please choose again.");
+                        break;
             }
         }
     }
